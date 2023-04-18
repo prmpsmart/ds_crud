@@ -1,10 +1,42 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router";
+
 
 
 const EmpListing = () =>
 {
-    const [ empdata, empdataChange ] = useState( null );
+    const [ empdata, empDataChange ] = useState( null );
+    const navigate = useNavigate();
+
+    const editItem = ( id ) =>
+    {
+        navigate( `/employee/edit/${ id }` );
+    }
+
+    const removeItem = ( id ) =>
+    {
+        if ( window.confirm( `Do you want to remove?` ) )
+        {
+            fetch( `${ process.env.REACT_APP_SERVER }/employee/${ id }`, {
+                method: "DELETE",
+                headers: { "content-type": "application/json" },
+            } ).then( ( res ) =>
+            {
+                alert( "Removed Successfully." );
+                // window.location.reload();
+            } ).catch( ( e ) =>
+            {
+                console.log( e.message );
+            } );
+        }
+    }
+
+    const loadDetail = ( id ) =>
+    {
+        navigate( `/employee/detail/${ id }` );
+    }
 
     useEffect( () =>
     {
@@ -13,12 +45,13 @@ const EmpListing = () =>
             return res.json();
         } ).then( ( resp ) =>
         {
-            empdataChange( resp );
+            empDataChange( resp );
         } ).catch( ( err ) =>
         {
             console.log( err.message );
         } )
     } )
+
     return (
         <div className="container">
             <div className="card">
@@ -48,9 +81,9 @@ const EmpListing = () =>
                                         <td>{ item.email }</td>
                                         <td>{ item.phone }</td>
                                         <td>
-                                            <a href="/" className="btn btn-success">Edit</a>
-                                            <a href="/" className="btn btn-danger">Remove</a>
-                                            <a href="/" className="btn btn-primary">Details</a>
+                                            <a onClick={ () => { editItem( item.id ) } } className="btn btn-success">Edit</a>
+                                            <a onClick={ () => { removeItem( item.id ) } } className="btn btn-danger">Remove</a>
+                                            <a onClick={ () => { loadDetail( item.id ) } } className="btn btn-primary">Details</a>
                                         </td>
                                     </tr>
                                 ) )
